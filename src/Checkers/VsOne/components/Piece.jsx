@@ -10,7 +10,7 @@ const Piece = ({ piece, currentTheme }) => {
 
     return (
         <motion.div
-            className={`w-12 h-12 rounded-full mx-auto my-auto ${neonBorder}`}
+            className={`w-12 h-12 rounded-full mx-auto my-auto ${neonBorder} md:w-16 md:h-16 sm:w-10 sm:h-10`}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.3 }}
