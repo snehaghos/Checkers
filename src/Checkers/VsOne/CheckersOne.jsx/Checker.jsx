@@ -4,9 +4,9 @@ import whitePieceImage from '../../../assets/images/whitepi.png';
 import blackPieceImage from '../../../assets/images/blackpi.png';
 import yellowPieceImage from '../../../assets/images/yellowpi.png';
 import brownPieceImage from '../../../assets/images/brownpi.png';
-import '../components/Checkers.css';
-import Board from '../components/Board';
-import Sidebar from '../components/Sidebar';
+import '../../components/Checkers.css';
+import Board from '../../components/Board';
+import Sidebar from '../../components/Sidebar';
 
 const boardSize = 8;
 const Checker = () => {
@@ -136,15 +136,17 @@ const Checker = () => {
     return (
         <div className={`flex flex-col items-center h-screen bg-gray-900 text-white`}>
             <Sidebar onThemeChange={() => { }} onSelectTheme={handleThemeSelect} />
-            <h1 className="text-3xl font-bold my-4">Checkers - {turn.toUpperCase()}'s Turn</h1>
-            <h2 className="text-lg mb-2">White: {scores.white} | Black: {scores.black}</h2>
-            <Board
-                board={board}
-                selectedPiece={selectedPiece}
-                possibleMoves={possibleMoves}
-                handleSquareClick={handleSquareClick}
-                currentTheme={currentTheme}
-            />
+            <h1 className="text-3xl font-bold my-4 md:text-2xl sm:text-xl xs:text-lg">Checkers - {turn.toUpperCase()}'s Turn</h1>
+            <h2 className="text-lg mb-2 md:text-base sm:text-sm xs:text-xs">White: {scores.white} | Black: {scores.black}</h2>
+            <div className="w-full flex justify-center">
+                <Board
+                    board={board}
+                    selectedPiece={selectedPiece}
+                    possibleMoves={possibleMoves}
+                    handleSquareClick={handleSquareClick}
+                    currentTheme={currentTheme}
+                />
+            </div>
         </div>
     );
 };

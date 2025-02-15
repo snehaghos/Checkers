@@ -4,9 +4,9 @@ import whitePieceImage from '../../assets/images/whitepi.png';
 import blackPieceImage from '../../assets/images/blackpi.png';
 import yellowPieceImage from '../../assets/images/yellowpi.png';
 import brownPieceImage from '../../assets/images/brownpi.png';
-import '../VsOne/components/Checkers.css';
-import Board from '../VsOne/components/Board';
-import Sidebar from '../VsOne/components/Sidebar';
+import '../components/Checkers.css';
+import Board from '../components/Board';
+import Sidebar from '../components/Sidebar';
 
 const boardSize = 8;
 const directions = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
@@ -146,7 +146,17 @@ const CheckersComp = () => {
                 possibleMoves={possibleMoves}
                 handleSquareClick={(row, col) => {
                     if (selectedPiece) {
-                        movePiece(selectedPiece.row, selectedPiece.col, row, col);
+                        if (selectedPiece.row === row && selectedPiece.col === col) {
+                            setSelectedPiece(null);
+                            setPossibleMoves([]);
+                        } else if (possibleMoves.some(move => move.row === row && move.col === col)) {
+                            
+                            movePiece(selectedPiece.row, selectedPiece.col, row, col);
+                        } else {
+                            
+                            setSelectedPiece(null);
+                            setPossibleMoves([]);
+                        }
                     } else if (board[row][col] && board[row][col].includes(turn)) {
                         setSelectedPiece({ row, col });
                         setPossibleMoves(calculatePossibleMoves(row, col));
