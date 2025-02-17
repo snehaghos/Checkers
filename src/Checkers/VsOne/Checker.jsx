@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useTheme } from '../../../Theme/ThemeProvider';
-import whitePieceImage from '../../../assets/images/whitepi.png';
-import blackPieceImage from '../../../assets/images/blackpi.png';
-import yellowPieceImage from '../../../assets/images/yellowpi.png';
-import brownPieceImage from '../../../assets/images/brownpi.png';
-import '../../components/Checkers.css';
-import Board from '../../components/Board';
-import Sidebar from '../../components/Sidebar';
+import { useTheme } from '../../Theme/ThemeProvider';
+import whitePieceImage from '../../assets/images/whitepi.png';
+import blackPieceImage from '../../assets/images/blackpi.png';
+import yellowPieceImage from '../../assets/images/yellowpi.png';
+import brownPieceImage from '../../assets/images/brownpi.png';
+import '../cssFiles/Checkers.css';
+import Board from '../components/Board';
+import Sidebar from '../components/Sidebar';
 
 const boardSize = 8;
 const Checker = () => {
@@ -146,6 +146,9 @@ const Checker = () => {
                     handleSquareClick={handleSquareClick}
                     currentTheme={currentTheme}
                 />
+            </div>
+            <div>
+                <button onClick={() => setBoard(initializeBoard())} className="bg-gray-300 text-gray-900 font-bold py-2 px-4 rounded-md">Reset</button>
             </div>
         </div>
     );

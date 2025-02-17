@@ -4,8 +4,9 @@ import Guestlayout from '../layouts/Guestlayout';
 
 
 import IndexHome from '../Checkers/IndexHome';
-import Checker from '../Checkers/VsOne/CheckersOne.jsx/Checker';
+
 import CheckersComp from '../Checkers/VsComputer/CheckersComp';
+import Checker from '../Checkers/VsOne/Checker';
 
 
 
