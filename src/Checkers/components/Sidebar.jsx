@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Sidebar.css";
+import "../cssFiles/Sidebar.css";
 import ThemeModal from "../../Theme/ThemeModal";
 
 

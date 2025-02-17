@@ -4,7 +4,7 @@ import whitePieceImage from '../../assets/images/whitepi.png';
 import blackPieceImage from '../../assets/images/blackpi.png';
 import yellowPieceImage from '../../assets/images/yellowpi.png';
 import brownPieceImage from '../../assets/images/brownpi.png';
-import '../components/Checkers.css';
+import '../cssFiles/Checkers.css';
 import Board from '../components/Board';
 import Sidebar from '../components/Sidebar';
 
@@ -131,7 +131,7 @@ const CheckersComp = () => {
 
     useEffect(() => {
         if (turn === 'black') {
-            setTimeout(aiMove, 500);
+            setTimeout(aiMove, 1000);
         }
     }, [turn, board]);
 
@@ -167,6 +167,5 @@ const CheckersComp = () => {
         </div>
     );
 };
-//sdhdh
 
-export default CheckersComp;
+export default CheckersComp
