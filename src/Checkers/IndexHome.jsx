@@ -30,7 +30,7 @@ const IndexHome = () => {
         speed: 0.2,
         points: 4,
       });
-      setFlick(false); // Reset flick effect
+      setFlick(false);
     }, 500);
   };
 
