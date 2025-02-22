@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import "../cssFiles/Sidebar.css";
 import ThemeModal from "../../Theme/ThemeModal";
+import { useNavigate } from "react-router-dom";
 
-
-
-
-const Sidebar = ({ onThemeChange, onHome, onStartOver, onSelectTheme }) => {
+const Sidebar = ({ onThemeChange, onHome, onInitialization, onSelectTheme }) => {
+    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
-    const [isThemeModalOpen, setIsThemeModalOpen] = useState(false)
+    const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
 
     return (
         <div className={`sidebar ${isOpen ? "open" : ""}`}>
@@ -17,14 +16,13 @@ const Sidebar = ({ onThemeChange, onHome, onStartOver, onSelectTheme }) => {
             {isOpen && (
                 <div className="sidebar-content">
                     <ul>
-                        <li onClick={onHome}>Home</li>
-                        <li onClick={onStartOver}>Start Over</li>
+                        <li onClick={() => navigate("/")}>Home</li>
+                        <li onClick={onInitialization}>Start Over</li>
                         <li onClick={() => setIsThemeModalOpen(true)}>Theme</li>
                     </ul>
                 </div>
             )}
 
-         
             <ThemeModal
                 isOpen={isThemeModalOpen}
                 onClose={() => setIsThemeModalOpen(false)}
