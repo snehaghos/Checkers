@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../Theme/ThemeProvider';
 import whitePieceImage from '../../assets/images/whitepi.png';
 import blackPieceImage from '../../assets/images/blackpi.png';
@@ -7,6 +7,9 @@ import brownPieceImage from '../../assets/images/brownpi.png';
 import '../cssFiles/Checkers.css';
 import Board from '../components/Board';
 import Sidebar from '../components/Sidebar';
+
+import LoseModal from '../components/Modals/LoseModal';
+import WinModal from '../components/Modals/winModal';
 
 const boardSize = 8;
 const directions = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
@@ -28,7 +31,9 @@ const CheckersComp = () => {
     const [selectedPiece, setSelectedPiece] = useState(null);
     const [possibleMoves, setPossibleMoves] = useState([]);
     const [turn, setTurn] = useState('white');
-    const [scores, setScores] = useState({ white: 0, black: 0 });
+    const [scores, setScores] = useState({ white: 12, black: 12 });
+    const [isGameOver, setIsGameOver] = useState(false);
+    const [isWin, setIsWin] = useState(false);
     const { theme, changeTheme } = useTheme();
     const [selectedTheme, setSelectedTheme] = useState("black-white");
 
@@ -87,19 +92,49 @@ const CheckersComp = () => {
             const midRow = (fromRow + toRow) / 2;
             const midCol = (fromCol + toCol) / 2;
             newBoard[midRow][midCol] = null;
-            setScores(prev => ({ ...prev, [turn]: prev[turn] + 1 }));
+            setScores(prev => ({
+                ...prev,
+                [turn === 'white' ? 'black' : 'white']: prev[turn === 'white' ? 'black' : 'white'] - 1
+            }));
         }
 
         if ((toRow === 0 && piece === 'black') || (toRow === boardSize - 1 && piece === 'white')) {
             newBoard[toRow][toCol] = piece + '-King';
-            setScores(prev => ({ ...prev, [turn]: prev[turn] + 3 }));
         }
 
         setBoard(newBoard);
         setSelectedPiece(null);
         setPossibleMoves([]);
         setTurn(turn === 'white' ? 'black' : 'white');
+
+        checkGameOver(newBoard);
     };
+
+
+
+    const checkGameOver = (newBoard) => {
+        const whitePieces = newBoard.flat().filter(piece => piece && piece.includes('white')).length;
+        const blackPieces = newBoard.flat().filter(piece => piece && piece.includes('black')).length;
+    
+        // Ensure game-over check only runs after a move
+        if (whitePieces === 12 && blackPieces === 12) return; 
+    
+        if (whitePieces === 0) {
+            setIsGameOver(true);
+            setIsWin(false);
+        } else if (blackPieces === 0) {
+            setIsGameOver(true);
+            setIsWin(true);
+        }
+    };
+    
+    const resetGame = () => {
+        setIsGameOver(false); 
+        setBoard(initializeBoard()); 
+        setScores({ white: 12, black: 12 }); 
+        setTurn('white');
+    };
+    
 
     const aiMove = () => {
         if (turn !== 'black') return;
@@ -150,10 +185,8 @@ const CheckersComp = () => {
                             setSelectedPiece(null);
                             setPossibleMoves([]);
                         } else if (possibleMoves.some(move => move.row === row && move.col === col)) {
-                            
                             movePiece(selectedPiece.row, selectedPiece.col, row, col);
                         } else {
-                            
                             setSelectedPiece(null);
                             setPossibleMoves([]);
                         }
@@ -164,8 +197,10 @@ const CheckersComp = () => {
                 }}
                 currentTheme={currentTheme}
             />
+{isGameOver && isWin && <WinModal onClose={resetGame} />}
+{isGameOver && !isWin && <LoseModal onClose={resetGame} />}
         </div>
     );
 };
 
-export default CheckersComp
+export default CheckersComp;

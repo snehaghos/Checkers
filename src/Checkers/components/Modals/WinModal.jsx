@@ -1,21 +1,31 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Confetti from 'react-confetti';
 
 const WinModal = ({ onClose }) => {
-  useEffect(() => {
-    // Automatically close the modal after 5 seconds
-    const timer = setTimeout(() => {
-      onClose();
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, [onClose]);
+  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+  // useEffect(() => {
+  //   // Automatically close the modal after 5 seconds
+  //   const timer = setTimeout(() => {
+  //     onClose();
+  //   }, 5000);
+  //   return () => clearTimeout(timer);
+  // }, [onClose]);
+
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+  //   };
+  //   window.addEventListener('resize', handleResize);
+  //   return () => window.removeEventListener('resize', handleResize);
+  // }, []);
 
   return (
     <>
       {/* Confetti effect */}
       <Confetti
-        width={window.innerWidth}
-        height={window.innerHeight}
+        width={windowSize.width}
+        height={windowSize.height}
         numberOfPieces={300}
         recycle={false}
       />
