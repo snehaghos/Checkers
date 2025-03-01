@@ -56,7 +56,7 @@ const IndexHome = () => {
 
       {/* Game Title & Buttons */}
       <motion.div
-        className="text-8xl font-extrabold font-luckiestGuy text-white cursor-pointer drop-shadow-2xl flex justify-center flex-col gap-6 items-center h-[100vh] relative md:text-6xl sm:text-4xl xs:text-2xl"
+        className="text-6xl font-extrabold font-luckiestGuy text-white cursor-pointer drop-shadow-2xl flex justify-center flex-col gap-6 items-center h-[100vh] relative md:text-6xl sm:text-4xl xs:text-2xl"
         initial={{ opacity: 0, y: "-100vh" }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 70, duration: 3.5 }}
