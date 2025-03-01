@@ -1,24 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import Confetti from 'react-confetti';
 
-const WinModal = ({ onClose }) => {
+const WinModal = ({ isOpen, winner, onClose }) => {
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
 
-  // useEffect(() => {
-  //   // Automatically close the modal after 5 seconds
-  //   const timer = setTimeout(() => {
-  //     onClose();
-  //   }, 5000);
-  //   return () => clearTimeout(timer);
-  // }, [onClose]);
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  // useEffect(() => {
-  //   const handleResize = () => {
-  //     setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-  //   };
-  //   window.addEventListener('resize', handleResize);
-  //   return () => window.removeEventListener('resize', handleResize);
-  // }, []);
+  if (!isOpen) return null;
 
   return (
     <>
@@ -35,11 +29,11 @@ const WinModal = ({ onClose }) => {
         <div className="bg-gradient-to-br from-purple-600 to-indigo-700 p-8 rounded-2xl shadow-2xl text-center transform transition-all duration-500 hover:scale-105">
           {/* Animated title */}
           <h1 className="text-6xl font-bold text-yellow-400 animate-bounce">
-            You Win! 🎉
+            {winner} Wins! 🎉
           </h1>
           {/* Subtitle */}
           <p className="text-2xl mt-4 text-white">
-            Congratulations on your victory!
+            {winner === 'White' ? "Congratulations! White player wins." : "Congratulations! Black player wins."}
           </p>
           {/* Play Again button */}
           <button

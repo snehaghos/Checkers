@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTheme } from '../../Theme/ThemeProvider';
 import whitePieceImage from '../../assets/images/whitepi.png';
@@ -8,14 +7,28 @@ import brownPieceImage from '../../assets/images/brownpi.png';
 import '../cssFiles/Checkers.css';
 import Board from '../components/Board';
 import Sidebar from '../components/Sidebar';
-import LoseModal from '../components/Modals/LoseModal';
+import WinModal from '../components/Modals/winModal';
 
 const boardSize = 8;
+
+const initializeBoard = () => {
+    const newBoard = Array(boardSize).fill(null).map(() => Array(boardSize).fill(null));
+    for (let row = 0; row < boardSize; row++) {
+        for (let col = 0; col < boardSize; col++) {
+            if ((row < 3 || row > 4) && (row + col) % 2 === 1) {
+                newBoard[row][col] = row < 3 ? 'white' : 'black';
+            }
+        }
+    }
+    return newBoard;
+};
+
 const Checker = () => {
     const [board, setBoard] = useState(() => initializeBoard());
     const [selectedPiece, setSelectedPiece] = useState(null);
     const [possibleMoves, setPossibleMoves] = useState([]);
-    const [turn, setTurn] = useState('white');
+    const [turn, setTurn] = useState('black');
+
     const [scores, setScores] = useState({ white: 12, black: 12 });
     const [isGameOver, setIsGameOver] = useState(false);
     const [winner, setWinner] = useState(null);
@@ -40,18 +53,6 @@ const Checker = () => {
     };
     const currentTheme = themeStyles[selectedTheme];
 
-    function initializeBoard() {
-        const newBoard = Array(boardSize).fill(null).map(() => Array(boardSize).fill(null));
-        for (let row = 0; row < boardSize; row++) {
-            for (let col = 0; col < boardSize; col++) {
-                if ((row < 3 || row > 4) && (row + col) % 2 === 1) {
-                    newBoard[row][col] = row < 3 ? 'white' : 'black';
-                }
-            }
-        }
-        return newBoard;
-    }
-
     const handleThemeSelect = (theme) => {
         setSelectedTheme(theme);
     };
@@ -60,9 +61,10 @@ const Checker = () => {
         setBoard(initializeBoard());
         setIsGameOver(false);
         setWinner(null);
-        setTurn('white');
+        setTurn('black');  // Now Black moves first
         setScores({ white: 12, black: 12 });
-    }
+    };
+    
 
     const isValidMove = (fromRow, fromCol, toRow, toCol) => {
         if (board[toRow][toCol] !== null) return false;
@@ -177,6 +179,20 @@ const Checker = () => {
         } else if (blackPieces === 0) {
             setWinner('White');
             setIsGameOver(true);
+        } else {
+            const hasMoves = newBoard.some((row, rowIndex) =>
+                row.some((cell, colIndex) => {
+                    if (cell && cell.includes(turn)) {
+                        const moves = calPossibleMove(rowIndex, colIndex);
+                        return moves.length > 0;
+                    }
+                    return false;
+                })
+            );
+            if (!hasMoves) {
+                setIsGameOver(true);
+                setWinner(turn === 'white' ? 'Black' : 'White');
+            }
         }
     };
 
@@ -240,7 +256,7 @@ const Checker = () => {
                     currentTheme={currentTheme}
                 />
             </div>
-            <LoseModal isOpen={isGameOver} winner={winner} onClose={() => setIsGameOver(false)} />
+            <WinModal isOpen={isGameOver} winner={winner} onClose={handleInitializeBoard} />
         </div>
     );
 };

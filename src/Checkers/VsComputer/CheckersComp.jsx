@@ -7,9 +7,7 @@ import brownPieceImage from '../../assets/images/brownpi.png';
 import '../cssFiles/Checkers.css';
 import Board from '../components/Board';
 import Sidebar from '../components/Sidebar';
-
-import LoseModal from '../components/Modals/LoseModal';
-import WinModal from '../components/Modals/winModal';
+import FinalGameOver from '../components/Modals/FinalGameOver';
 
 const boardSize = 8;
 const directions = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
@@ -29,8 +27,9 @@ const initializeBoard = () => {
 const CheckersComp = () => {
     const [board, setBoard] = useState(() => initializeBoard());
     const [selectedPiece, setSelectedPiece] = useState(null);
+    const [turn, setTurn] = useState('black');
+
     const [possibleMoves, setPossibleMoves] = useState([]);
-    const [turn, setTurn] = useState('white');
     const [scores, setScores] = useState({ white: 12, black: 12 });
     const [isGameOver, setIsGameOver] = useState(false);
     const [isWin, setIsWin] = useState(false);
@@ -62,7 +61,8 @@ const CheckersComp = () => {
         if (!piece) return [];
 
         const isKing = piece.includes("King");
-        const pieceDirections = isKing ? directions : piece.includes('white') ? [[1, 1], [1, -1]] : [[-1, 1], [-1, -1]];
+        const pieceColor = piece.split('-')[0];
+        const pieceDirections = isKing ? directions : pieceColor === 'white' ? [[1, 1], [1, -1]] : [[-1, 1], [-1, -1]];
         const moves = [];
 
         pieceDirections.forEach(([dRow, dCol]) => {
@@ -71,10 +71,13 @@ const CheckersComp = () => {
             if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize && board[newRow][newCol] === null) {
                 moves.push({ row: newRow, col: newCol });
             }
-            if (newRow + dRow >= 0 && newRow + dRow < boardSize && newCol + dCol >= 0 && newCol + dCol < boardSize) {
-                if (board[newRow][newCol] && !board[newRow][newCol].includes(piece)) {
-                    if (board[newRow + dRow][newCol + dCol] === null) {
-                        moves.push({ row: newRow + dRow, col: newCol + dCol });
+            if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {
+                const midPiece = board[newRow][newCol];
+                if (midPiece && !midPiece.startsWith(pieceColor)) {
+                    const jumpRow = newRow + dRow;
+                    const jumpCol = newCol + dCol;
+                    if (jumpRow >= 0 && jumpRow < boardSize && jumpCol >= 0 && jumpCol < boardSize && board[jumpRow][jumpCol] === null) {
+                        moves.push({ row: jumpRow, col: jumpCol });
                     }
                 }
             }
@@ -94,62 +97,80 @@ const CheckersComp = () => {
             newBoard[midRow][midCol] = null;
             setScores(prev => ({
                 ...prev,
-                [turn === 'white' ? 'black' : 'white']: prev[turn === 'white' ? 'black' : 'white'] - 1
+                [piece.startsWith('white') ? 'black' : 'white']: prev[piece.startsWith('white') ? 'black' : 'white'] - 1
             }));
         }
 
-        if ((toRow === 0 && piece === 'black') || (toRow === boardSize - 1 && piece === 'white')) {
-            newBoard[toRow][toCol] = piece + '-King';
+        const pieceColor = piece.split('-')[0];
+        if ((toRow === 0 && pieceColor === 'black') || (toRow === boardSize - 1 && pieceColor === 'white')) {
+            newBoard[toRow][toCol] = `${pieceColor}-King`;
         }
 
         setBoard(newBoard);
         setSelectedPiece(null);
         setPossibleMoves([]);
-        setTurn(turn === 'white' ? 'black' : 'white');
+        const nextTurn = turn === 'white' ? 'black' : 'white';
+        setTurn(nextTurn);
 
-        checkGameOver(newBoard);
+        checkGameOver(newBoard, nextTurn);
     };
 
+    const checkGameOver = (newBoard, nextTurn) => {
+        const whitePieces = newBoard.flat().filter(piece => piece && piece.startsWith('white')).length;
+        const blackPieces = newBoard.flat().filter(piece => piece && piece.startsWith('black')).length;
 
-
-    const checkGameOver = (newBoard) => {
-        const whitePieces = newBoard.flat().filter(piece => piece && piece.includes('white')).length;
-        const blackPieces = newBoard.flat().filter(piece => piece && piece.includes('black')).length;
-    
-        // Ensure game-over check only runs after a move
-        if (whitePieces === 12 && blackPieces === 12) return; 
-    
         if (whitePieces === 0) {
             setIsGameOver(true);
             setIsWin(false);
         } else if (blackPieces === 0) {
             setIsGameOver(true);
             setIsWin(true);
+        } else {
+            const hasMoves = checkPlayerHasMoves(newBoard, nextTurn);
+            if (!hasMoves) {
+                setIsGameOver(true);
+                setIsWin(nextTurn === 'black'); 
+            }
         }
     };
-    
-    const resetGame = () => {
-        setIsGameOver(false); 
-        setBoard(initializeBoard()); 
-        setScores({ white: 12, black: 12 }); 
-        setTurn('white');
+
+    const checkPlayerHasMoves = (board, player) => {
+        for (let row = 0; row < boardSize; row++) {
+            for (let col = 0; col < boardSize; col++) {
+                const piece = board[row][col];
+                if (piece && piece.startsWith(player)) {
+                    const moves = calculatePossibleMoves(row, col);
+                    if (moves.length > 0) return true;
+                }
+            }
+        }
+        return false; // No moves left for this player
     };
     
 
+    const resetGame = () => {
+        setIsGameOver(false);
+        setBoard(initializeBoard());
+        setScores({ white: 12, black: 12 });
+        setTurn('black'); // User starts
+    };
+    
     const aiMove = () => {
-        if (turn !== 'black') return;
+        if (turn !== 'white') return; // AI should play as white
+    
         let bestMove = null;
         let bestScore = -Infinity;
-
+    
         board.forEach((row, rowIndex) => {
             row.forEach((cell, colIndex) => {
-                if (cell && cell.includes('black')) {
+                if (cell && cell.startsWith('white')) { // AI should move white pieces
                     const moves = calculatePossibleMoves(rowIndex, colIndex);
                     moves.forEach(({ row: newRow, col: newCol }) => {
                         const tempBoard = board.map(r => r.slice());
                         tempBoard[newRow][newCol] = cell;
                         tempBoard[rowIndex][colIndex] = null;
-                        let moveScore = (Math.abs(newRow - rowIndex) === 2) ? 10 : 1;
+                        let moveScore = (Math.abs(newRow - rowIndex) === 2) ? 10 : 1; // Prioritize jumps
+                        
                         if (moveScore > bestScore) {
                             bestScore = moveScore;
                             bestMove = { fromRow: rowIndex, fromCol: colIndex, toRow: newRow, toCol: newCol };
@@ -158,28 +179,33 @@ const CheckersComp = () => {
                 }
             });
         });
-
+    
         if (bestMove) {
             movePiece(bestMove.fromRow, bestMove.fromCol, bestMove.toRow, bestMove.toCol);
         }
     };
+    
 
     useEffect(() => {
-        if (turn === 'black') {
+        if (turn === 'white') {
             setTimeout(aiMove, 1000);
         }
     }, [turn, board]);
+    
 
     return (
         <div className={`flex flex-col items-center h-screen bg-gray-900 text-white`}>
             <Sidebar onThemeChange={() => { }} onSelectTheme={handleThemeSelect} />
-            <h1 className="text-3xl font-bold my-4">Checkers - {turn.toUpperCase()}'s Turn</h1>
+            <h1 className="text-3xl font-bold my-4">
+    Checkers - {turn === 'black' ? "User's Turn" : "Computer's Turn"}
+</h1>
             <h2 className="text-lg mb-2">White: {scores.white} | Black: {scores.black}</h2>
             <Board
                 board={board}
                 selectedPiece={selectedPiece}
                 possibleMoves={possibleMoves}
                 handleSquareClick={(row, col) => {
+                    if (isGameOver) return;
                     if (selectedPiece) {
                         if (selectedPiece.row === row && selectedPiece.col === col) {
                             setSelectedPiece(null);
@@ -190,15 +216,14 @@ const CheckersComp = () => {
                             setSelectedPiece(null);
                             setPossibleMoves([]);
                         }
-                    } else if (board[row][col] && board[row][col].includes(turn)) {
+                    } else if (board[row][col] && board[row][col].startsWith(turn)) {
                         setSelectedPiece({ row, col });
                         setPossibleMoves(calculatePossibleMoves(row, col));
                     }
                 }}
                 currentTheme={currentTheme}
             />
-{isGameOver && isWin && <WinModal onClose={resetGame} />}
-{isGameOver && !isWin && <LoseModal onClose={resetGame} />}
+            <FinalGameOver isOpen={isGameOver} isWin={isWin} onClose={resetGame} />
         </div>
     );
 };
